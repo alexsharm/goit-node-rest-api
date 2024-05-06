@@ -1,11 +1,81 @@
 import contactsService from "../services/contactsServices.js";
+import HttpError from "../helpers/HttpError.js";
 
-export const getAllContacts = (req, res) => {};
+export const getAllContacts = async (req, res, next) => {
+  try {
+    const movies = await contactsService.listContacts();
+    res.status(200).send(movies);
+  } catch (error) {
+    next(error);
+  }
+};
 
-export const getOneContact = (req, res) => {};
+export const getOneContact = async (req, res, next) => {
+  try {
+    const { id } = req.params;
 
-export const deleteContact = (req, res) => {};
+    const movie = await contactsService.getContactById(id);
 
-export const createContact = (req, res) => {};
+    if (!movie) {
+      throw HttpError(404);
+    }
 
-export const updateContact = (req, res) => {};
+    res.status(200).send(movie);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deleteContact = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    const movie = await contactsService.removeContact(id);
+
+    if (!movie) {
+      throw HttpError(404);
+    }
+
+    res.status(200).send(movie);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const createContact = async (req, res, next) => {
+  try {
+    const contact = {
+      name: req.body.name,
+      email: req.body.email,
+      phone: req.body.phone,
+    };
+
+    const newContact = await contactsService.addContact(contact);
+
+    res.status(201).send(newContact);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateContact = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    const contact = {
+      name: req.body.name,
+      email: req.body.email,
+      phone: req.body.phone,
+    };
+
+    const updatedContact = await contactsService.updateContact(id, contact);
+
+    if (!updatedContact) {
+      throw HttpError(404);
+    }
+
+    res.status(201).send(updatedContact);
+  } catch (error) {
+    next(error);
+  }
+};
