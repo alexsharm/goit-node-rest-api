@@ -68,6 +68,11 @@ export const updateContact = async (req, res, next) => {
       phone: req.body.phone,
     };
 
+    if (Object.keys(req.body).length === 0) {
+      console.log("bebra");
+      throw HttpError(400, "Body must have at least one field");
+    }
+
     const updatedContact = await contactsService.updateContact(id, contact);
 
     if (!updatedContact) {
