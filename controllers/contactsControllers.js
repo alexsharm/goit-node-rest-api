@@ -14,9 +14,9 @@ export const getOneContact = async (req, res, next) => {
   try {
     const { id } = req.params;
 
-    const movie = await contactsService.getContactById(id);
+    const contact = await contactsService.getContactById(id);
 
-    if (!movie) {
+    if (!contact) {
       throw HttpError(404);
     }
 
@@ -30,9 +30,9 @@ export const deleteContact = async (req, res, next) => {
   try {
     const { id } = req.params;
 
-    const movie = await contactsService.removeContact(id);
+    const contact = await contactsService.removeContact(id);
 
-    if (!movie) {
+    if (!contact) {
       throw HttpError(404);
     }
 
@@ -62,6 +62,12 @@ export const updateContact = async (req, res, next) => {
   try {
     const { id } = req.params;
 
+    const contactBeforeUpdate = await contactsService.getContactById(id);
+
+    if (!contactBeforeUpdate) {
+      throw HttpError(404);
+    }
+
     const contact = {
       name: req.body.name,
       email: req.body.email,
@@ -69,15 +75,10 @@ export const updateContact = async (req, res, next) => {
     };
 
     if (Object.keys(req.body).length === 0) {
-      console.log("bebra");
       throw HttpError(400, "Body must have at least one field");
     }
 
     const updatedContact = await contactsService.updateContact(id, contact);
-
-    if (!updatedContact) {
-      throw HttpError(404);
-    }
 
     res.status(201).send(updatedContact);
   } catch (error) {
