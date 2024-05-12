@@ -20,7 +20,7 @@ export const getOneContact = async (req, res, next) => {
       throw HttpError(404);
     }
 
-    res.status(200).send(movie);
+    res.status(200).send(contact);
   } catch (error) {
     next(error);
   }
@@ -36,7 +36,7 @@ export const deleteContact = async (req, res, next) => {
       throw HttpError(404);
     }
 
-    res.status(200).send(movie);
+    res.status(200).send(contact);
   } catch (error) {
     next(error);
   }
