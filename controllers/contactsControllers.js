@@ -62,6 +62,12 @@ export const updateContact = async (req, res, next) => {
   try {
     const { id } = req.params;
 
+    const contactBeforeUpdate = await contactsService.getContactById(id);
+
+    if (!contactBeforeUpdate) {
+      throw HttpError(404);
+    }
+
     const contact = {
       name: req.body.name,
       email: req.body.email,
@@ -74,11 +80,11 @@ export const updateContact = async (req, res, next) => {
 
     const updatedContact = await contactsService.updateContact(id, contact);
 
-    if (!updatedContact) {
-      throw HttpError(404);
-    }
+    // if (!updatedContact) {
+    //   throw HttpError(404);
+    // }
 
-    res.status(201).send(updatedContact);
+    res.status(200).send(updatedContact);
   } catch (error) {
     next(error);
   }
@@ -109,7 +115,7 @@ export const updateStatus = async (req, res, next) => {
       throw HttpError(404);
     }
 
-    res.status(201).send(updatedContact);
+    res.status(200).send(updatedContact);
   } catch (error) {
     next(error);
   }
