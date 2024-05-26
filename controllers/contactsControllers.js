@@ -3,8 +3,8 @@ import HttpError from "../helpers/HttpError.js";
 
 export const getAllContacts = async (req, res, next) => {
   try {
-    const movies = await contactsService.listContacts();
-    res.status(200).send(movies);
+    const contacts = await contactsService.listContacts();
+    res.status(200).send(contacts);
   } catch (error) {
     next(error);
   }
@@ -50,9 +50,9 @@ export const createContact = async (req, res, next) => {
       phone: req.body.phone,
     };
 
-    const newContact = await contactsService.addContact(contact);
+    const result = await contactsService.addContact(contact);
 
-    res.status(201).send(newContact);
+    res.status(201).send(result);
   } catch (error) {
     next(error);
   }
@@ -80,7 +80,42 @@ export const updateContact = async (req, res, next) => {
 
     const updatedContact = await contactsService.updateContact(id, contact);
 
-    res.status(201).send(updatedContact);
+    // if (!updatedContact) {
+    //   throw HttpError(404);
+    // }
+
+    res.status(200).send(updatedContact);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateStatus = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    const contactBeforeUpdate = await contactsService.getContactById(id);
+
+    if (!contactBeforeUpdate) {
+      throw HttpError(404);
+    }
+
+    const favorite = req.body.favorite;
+
+    if (favorite === undefined) {
+      throw HttpError(400, "Body must have status value");
+    }
+
+    const updatedContact = await contactsService.updateStatusContact(
+      id,
+      favorite
+    );
+
+    if (!updatedContact) {
+      throw HttpError(404);
+    }
+
+    res.status(200).send(updatedContact);
   } catch (error) {
     next(error);
   }
