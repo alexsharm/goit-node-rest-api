@@ -44,8 +44,6 @@ export const deleteContact = async (req, res, next) => {
 
 export const createContact = async (req, res, next) => {
   try {
-    console.log(req.user);
-
     const contact = {
       name: req.body.name,
       email: req.body.email,
