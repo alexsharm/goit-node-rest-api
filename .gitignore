@@ -6,3 +6,8 @@
 .env.local
 
 node_modules
+
+tmp/*
+!tmp/.gitkeep
+public/avatars/*
+!public/avatars/.gitkeep
