@@ -1,14 +1,13 @@
-import contact from "../models/contact.js";
 import Contact from "../models/contact.js";
 
-async function listContacts() {
-  const contacts = await Contact.find();
+async function listContacts(ownerId) {
+  const contacts = await Contact.find({ owner: ownerId });
 
   return contacts;
 }
 
-async function getContactById(contactId) {
-  const contact = Contact.findById(contactId);
+async function getContactById(contactId, ownerId) {
+  const contact = Contact.findOne({ _id: contactId, owner: ownerId });
 
   if (typeof contact === "undefined") {
     return null;
@@ -17,8 +16,11 @@ async function getContactById(contactId) {
   return contact;
 }
 
-async function removeContact(contactId) {
-  const removedContact = await Contact.findByIdAndDelete(contactId);
+async function removeContact(contactId, ownerId) {
+  const removedContact = await Contact.findOneAndDelete({
+    _id: contactId,
+    owner: ownerId,
+  });
 
   if (removedContact === undefined) {
     return null;
@@ -33,7 +35,7 @@ async function addContact(newContact) {
   return result;
 }
 
-async function updateContact(contactId, { name, email, phone, favorite }) {
+async function updateContact(contactId, ownerId, { name, email, phone }) {
   const contactToUpdate = await Contact.findById(contactId);
 
   let newName;
@@ -50,8 +52,11 @@ async function updateContact(contactId, { name, email, phone, favorite }) {
     phone: newPhone,
   };
 
-  const updatedContact = await Contact.findByIdAndUpdate(
-    contactId,
+  const updatedContact = await Contact.findOneAndUpdate(
+    {
+      _id: contactId,
+      owner: ownerId,
+    },
     updateBody,
     { new: true }
   );
@@ -63,7 +68,7 @@ async function updateContact(contactId, { name, email, phone, favorite }) {
   return updatedContact;
 }
 
-async function updateStatusContact(contactId, favorite) {
+async function updateStatusContact(contactId, ownerId, favorite) {
   const contactToUpdate = await Contact.findById(contactId);
 
   const updateBody = {
@@ -73,8 +78,11 @@ async function updateStatusContact(contactId, favorite) {
     favorite,
   };
 
-  const updatedContact = await Contact.findByIdAndUpdate(
-    contactId,
+  const updatedContact = await Contact.findOneAndUpdate(
+    {
+      _id: contactId,
+      owner: ownerId,
+    },
     updateBody,
     { new: true }
   );
