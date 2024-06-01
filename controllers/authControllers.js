@@ -147,12 +147,10 @@ async function extraVerification(req, res, next) {
 
     const user = await User.findOne({ email: emailInLowerCase });
 
-    console.log(user);
-
-    console.log(user.verify);
-
     if (user.verify === true) {
-      res.status(400).send({ message: "Verification has already been passed" });
+      return res
+        .status(400)
+        .send({ message: "Verification has already been passed" });
     }
 
     const verificationToken = crypto.randomUUID();
