@@ -1,3 +1,5 @@
+import crypto from "node:crypto";
+
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
@@ -21,10 +23,13 @@ async function register(req, res, next) {
 
     const avatar = gravatar.url(emailInLowerCase);
 
+    const verificationToken = crypto.randomUUID();
+
     const newUser = await User.create({
       email: emailInLowerCase,
       password: passwordHash,
       avatarURL: avatar,
+      verificationToken,
     });
 
     res.status(201).send({
