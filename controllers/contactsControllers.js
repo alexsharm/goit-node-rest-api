@@ -63,14 +63,14 @@ export const updateContact = async (req, res, next) => {
   try {
     const { id } = req.params;
 
-    const contactBeforeUpdate = await contactsService.getContactById(
-      id,
-      req.user.id
-    );
+    // const contactBeforeUpdate = await contactsService.getContactById(
+    //   id,
+    //   req.user.id
+    // );
 
-    if (!contactBeforeUpdate) {
-      throw HttpError(404);
-    }
+    // if (!contactBeforeUpdate) {
+    //   throw HttpError(404);
+    // }
 
     const contact = {
       name: req.body.name,
@@ -98,14 +98,14 @@ export const updateStatus = async (req, res, next) => {
   try {
     const { id } = req.params;
 
-    const contactBeforeUpdate = await contactsService.getContactById(
-      id,
-      req.user.id
-    );
+    // const contactBeforeUpdate = await contactsService.getContactById(
+    //   id,
+    //   req.user.id
+    // );
 
-    if (!contactBeforeUpdate) {
-      throw HttpError(404);
-    }
+    // if (!contactBeforeUpdate) {
+    //   throw HttpError(404);
+    // }
 
     const favorite = req.body.favorite;
 
