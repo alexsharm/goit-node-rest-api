@@ -3,6 +3,8 @@ import crypto from "node:crypto";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
+import mail from "../mail.js";
+
 import gravatar from "gravatar";
 
 import User from "../models/user.js";
@@ -32,6 +34,14 @@ async function register(req, res, next) {
       verificationToken,
     });
 
+    mail.sendMail({
+      to: emailInLowerCase,
+      from: "al.len@meta.ua",
+      subject: "Welcome to contact book",
+      html: `To confirm your email please click on the <a href="http://localhost:3000/api/users/verify/${verificationToken}">link</a>`,
+      text: `To confirm your email please open the link http://localhost:3000/api/users/verify/${verificationToken}`,
+    });
+
     res.status(201).send({
       user: { email: newUser.email, subscription: newUser.subscription },
     });
@@ -58,6 +68,10 @@ async function login(req, res, next) {
 
     if (isMatch === false) {
       return res.status(401).send({ message: "Email or password is wrong" });
+    }
+
+    if (user.verify === false) {
+      return res.status(401).send({ message: "Please verify your email" });
     }
 
     const token = jwt.sign(
@@ -99,9 +113,78 @@ async function getCurrentUser(req, res, next) {
   }
 }
 
+async function verify(req, res, next) {
+  try {
+    const { verificationToken } = req.params;
+
+    const user = await User.findOneAndUpdate(
+      {
+        verificationToken: verificationToken,
+      },
+      {
+        verify: true,
+        verificationToken: null,
+      }
+    );
+
+    if (user === null) {
+      return res.status(404).send({ message: "User not found" });
+    }
+
+    res.send({
+      message: "Verification successful",
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+async function extraVerification(req, res, next) {
+  try {
+    const { email } = req.body;
+
+    const emailInLowerCase = email.toLowerCase();
+
+    const user = await User.findOne({ email: emailInLowerCase });
+
+    console.log(user);
+
+    console.log(user.verify);
+
+    if (user.verify === true) {
+      res.status(400).send({ message: "Verification has already been passed" });
+    }
+
+    const verificationToken = crypto.randomUUID();
+
+    await User.findOneAndUpdate(
+      {
+        email: emailInLowerCase,
+      },
+      {
+        verificationToken: verificationToken,
+      }
+    );
+
+    mail.sendMail({
+      to: emailInLowerCase,
+      from: "al.len@meta.ua",
+      subject: "Welcome to contact book",
+      html: `To confirm your email please click on the <a href="http://localhost:3000/api/users/verify/${verificationToken}">link</a>`,
+      text: `To confirm your email please open the link http://localhost:3000/api/users/verify/${verificationToken}`,
+    });
+
+    res.send({ message: "Verification email sent" });
+  } catch (error) {
+    next(error);
+  }
+}
+
 export default {
   register,
   login,
   logout,
   getCurrentUser,
+  verify,
+  extraVerification,
 };

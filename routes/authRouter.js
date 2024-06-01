@@ -6,7 +6,10 @@ import authMiddleware from "../middleware/auth.js";
 
 import validateBody from "../helpers/validateBody.js";
 
-import { authUserSchema } from "../schemas/usersSchemas.js";
+import {
+  authUserSchema,
+  verificationEmailSchema,
+} from "../schemas/usersSchemas.js";
 
 import uploadMiddleware from "../middleware/upload.js";
 
@@ -36,6 +39,14 @@ authRouter.patch(
   authMiddleware,
   uploadMiddleware.single("avatar"),
   AvatarController.uploadAvatar
+);
+
+authRouter.get("/verify/:verificationToken", AuthController.verify);
+
+authRouter.post(
+  "/verify",
+  validateBody(verificationEmailSchema),
+  AuthController.extraVerification
 );
 
 export default authRouter;
