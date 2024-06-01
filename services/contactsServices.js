@@ -61,10 +61,6 @@ async function updateContact(contactId, ownerId, { name, email, phone }) {
     { new: true }
   );
 
-  if (!updatedContact) {
-    return null;
-  }
-
   return updatedContact;
 }
 

@@ -6,7 +6,14 @@ import authMiddleware from "../middleware/auth.js";
 
 import validateBody from "../helpers/validateBody.js";
 
-import { authUserSchema } from "../schemas/usersSchemas.js";
+import {
+  authUserSchema,
+  verificationEmailSchema,
+} from "../schemas/usersSchemas.js";
+
+import uploadMiddleware from "../middleware/upload.js";
+
+import AvatarController from "../controllers/avatarControllers.js";
 
 const authRouter = express.Router();
 const jsonParser = express.json();
@@ -26,5 +33,20 @@ authRouter.post(
 authRouter.post("/logout", authMiddleware, AuthController.logout);
 
 authRouter.get("/current", authMiddleware, AuthController.getCurrentUser);
+
+authRouter.patch(
+  "/avatars",
+  authMiddleware,
+  uploadMiddleware.single("avatar"),
+  AvatarController.uploadAvatar
+);
+
+authRouter.get("/verify/:verificationToken", AuthController.verify);
+
+authRouter.post(
+  "/verify",
+  validateBody(verificationEmailSchema),
+  AuthController.extraVerification
+);
 
 export default authRouter;
